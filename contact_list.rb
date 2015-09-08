@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require_relative 'contact'
+require_relative 'number'
 
 # TODO: Implement command line interaction
 # This should be the only file where you use puts and gets
@@ -25,29 +26,27 @@ class Application
           firstname = $stdin.gets.chomp
           puts "Enter contact's last name: "
           lastname = $stdin.gets.chomp
+          contact = Contact.new(firstname, lastname, email)
+          contact.save
+          puts "New contact created with id: #{contact.id}"
           puts "Add phone numbers (yes/no)?"
           cmd = $stdin.gets.chomp
           if cmd.downcase == "yes"
             numbers = {}
             while true
-              puts "Enter label for the phone number: "
-              label = $stdin.gets.chomp
+              puts "Enter tag for the phone number: "
+              tag = $stdin.gets.chomp
               puts "Enter phone number: "
               number = $stdin.gets.chomp
-              numbers[label] = number
+              new_number = Number.new(contact.id, tag, number)
+              new_number.save
+              puts "Number added with id: #{new_number.id}"
               puts "Add another one? (yes/no)"
               cmd = $stdin.gets.chomp
               if cmd.downcase == "no"
                 break
               end
             end
-            contact = Contact.new(firstname, lastname, email, numbers)
-            contact.save
-            puts "New contact created with id: #{contact.id}"
-          else
-            contact = Contact.new(firstname, lastname, email)
-            contact.save
-            puts "New contact created with id: #{contact.id}"
           end
         else
           puts "Contact already exists in the database"
@@ -57,12 +56,10 @@ class Application
         if list.length != 0
           list.each do |contact|
             output = "#{contact.id}: #{contact.firstname} #{contact.lastname} (#{contact.email})"
-            # i = 3
-            # while item[i] != nil
-            #   arr = item[i].split(":")
-            #   output += " - #{arr[0].capitalize}: #{arr[1]}"
-            #   i += 1
-            # end
+            numbers = Number.find_all_by_contactid(contact.id)
+            numbers.each do |number|
+              output += " - #{number.tag}: #{number.number}"
+            end
             puts output
           end
           puts "---"
@@ -77,12 +74,10 @@ class Application
           if contact != nil
             puts "Name: #{contact.firstname} #{contact.lastname}"
             puts "Email: #{contact.email}"
-            # i = 3
-            # while result[i] != nil
-            #   arr = result[i].split(":")
-            #   puts "#{arr[0].capitalize}: #{arr[1]}"
-            #   i += 1
-            # end
+            numbers = Number.find_all_by_contactid(contact.id)
+            numbers.each do |number|
+              puts "#{number.tag}: #{number.number}"
+            end
           else
             puts "Not found"
           end
@@ -97,6 +92,10 @@ class Application
             result.each do |contact|
               puts "Name: #{contact.firstname} #{contact.lastname}"
               puts "Email: #{contact.email}"
+              numbers = Number.find_all_by_contactid(contact.id)
+              numbers.each do |number|
+                puts "#{number.tag}: #{number.number}"
+              end
               puts "----------------------------------------------"
             end
           else

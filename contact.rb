@@ -6,16 +6,15 @@ class Contact
   attr_accessor :firstname, :lastname, :email, :numbers
   attr_reader :id
 
-  def initialize(firstname, lastname, email, numbers = {}, id = nil)
+  def initialize(firstname, lastname, email, id = nil)
     @id = id
     @firstname = firstname
     @lastname = lastname
     @email = email
-    @numbers = numbers
   end
- 
-  def to_s
-    "#{@name} (#{email})"
+
+  def persisted?
+    !id.nil?
   end
 
   def save
@@ -30,10 +29,6 @@ class Contact
     true
   rescue
     false
-  end
-
-  def persisted?
-    !id.nil?
   end
 
   def destroy
@@ -58,7 +53,7 @@ class Contact
       sql = "SELECT * FROM contacts WHERE id = $1;"
       connection.exec_params(sql, [id]) do |response|
         result = response.values[0]
-        Contact.new(result[1], result[2], result[3], {}, result[0])
+        Contact.new(result[1], result[2], result[3], result[0])
       end
     rescue
       nil
@@ -70,7 +65,7 @@ class Contact
       sql = "SELECT * FROM contacts WHERE lastname = $1;"
       connection.exec_params(sql, [name]) do |response|
         response.values.each do |row|
-          contacts << Contact.new(row[1], row[2], row[3], {}, row[0])
+          contacts << Contact.new(row[1], row[2], row[3], row[0])
         end
       end
 
@@ -83,7 +78,7 @@ class Contact
       sql = "SELECT * FROM contacts WHERE firstname = $1;"
       connection.exec_params(sql, [name]) do |response|
         response.values.each do |row|
-          contacts << Contact.new(row[1], row[2], row[3], {}, row[0])
+          contacts << Contact.new(row[1], row[2], row[3], row[0])
         end
       end
 
@@ -94,7 +89,7 @@ class Contact
       sql = "SELECT * FROM contacts WHERE email = $1;"
       connection.exec_params(sql, [email]) do |response|
         result = response.values[0]
-        Contact.new(result[1], result[2], result[3], {}, result[0])
+        Contact.new(result[1], result[2], result[3], result[0])
       end
     rescue
       nil
@@ -106,7 +101,7 @@ class Contact
       sql = "SELECT * FROM contacts WHERE firstname LIKE '%#{term}%' OR lastname LIKE '%#{term}%' OR email LIKE '%#{term}%';"
       connection.exec(sql) do |response|
         response.values.each do |row|
-          contacts << Contact.new(row[1], row[2], row[3], {}, row[0])
+          contacts << Contact.new(row[1], row[2], row[3], row[0])
         end
       end
 
@@ -119,7 +114,7 @@ class Contact
       sql = "SELECT * FROM contacts;"
       connection.exec(sql) do |response|
         response.values.each do |row|
-          contacts << Contact.new(row[1], row[2], row[3], {}, row[0])
+          contacts << Contact.new(row[1], row[2], row[3], row[0])
         end
       end
 
