@@ -39,7 +39,7 @@ class Application
               puts "Enter phone number: "
               number = $stdin.gets.chomp
               new_number = Number.new(contact.id, tag, number)
-              new_number.save
+              new_number.saveno
               puts "Number added with id: #{new_number.id}"
               puts "Add another one? (yes/no)"
               cmd = $stdin.gets.chomp
