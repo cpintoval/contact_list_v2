@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
-require_relative 'contact'
-require_relative 'number'
+require_relative 'setup'
 
 # TODO: Implement command line interaction
 # This should be the only file where you use puts and gets
@@ -26,8 +25,7 @@ class Application
           firstname = $stdin.gets.chomp
           puts "Enter contact's last name: "
           lastname = $stdin.gets.chomp
-          contact = Contact.new(firstname, lastname, email)
-          contact.save
+          contact = Contact.create(firstname: firstname, lastname: lastname, email: email)
           puts "New contact created with id: #{contact.id}"
           puts "Add phone numbers (yes/no)?"
           cmd = $stdin.gets.chomp
@@ -38,8 +36,7 @@ class Application
               tag = $stdin.gets.chomp
               puts "Enter phone number: "
               number = $stdin.gets.chomp
-              new_number = Number.new(contact.id, tag, number)
-              new_number.saveno
+              new_number = contact.numbers.create(tag: tag, number: number)
               puts "Number added with id: #{new_number.id}"
               puts "Add another one? (yes/no)"
               cmd = $stdin.gets.chomp
@@ -74,36 +71,36 @@ class Application
           if contact != nil
             puts "Name: #{contact.firstname} #{contact.lastname}"
             puts "Email: #{contact.email}"
-            numbers = Number.find_all_by_contactid(contact.id)
-            numbers.each do |number|
-              puts "#{number.tag}: #{number.number}"
-            end
+            # numbers = Number.find_all_by_contactid(contact.id)
+            # numbers.each do |number|
+            #   puts "#{number.tag}: #{number.number}"
+            # end
           else
             puts "Not found"
           end
         else
           puts "Need to specify id to show"
         end
-      when 'search'
-        term = ARGV[1]
-        if !term.nil? && !term.empty?
-          result = Contact.search(term)
-          if result != []
-            result.each do |contact|
-              puts "Name: #{contact.firstname} #{contact.lastname}"
-              puts "Email: #{contact.email}"
-              numbers = Number.find_all_by_contactid(contact.id)
-              numbers.each do |number|
-                puts "#{number.tag}: #{number.number}"
-              end
-              puts "----------------------------------------------"
-            end
-          else
-            puts "Not found"
-          end
-        else
-          puts "Need to specify term to search"
-        end
+      # when 'search'
+      #   term = ARGV[1]
+      #   if !term.nil? && !term.empty?
+      #     result = Contact.search(term)
+      #     if result != []
+      #       result.each do |contact|
+      #         puts "Name: #{contact.firstname} #{contact.lastname}"
+      #         puts "Email: #{contact.email}"
+      #         numbers = Number.find_all_by_contactid(contact.id)
+      #         numbers.each do |number|
+      #           puts "#{number.tag}: #{number.number}"
+      #         end
+      #         puts "----------------------------------------------"
+      #       end
+      #     else
+      #       puts "Not found"
+      #     end
+      #   else
+      #     puts "Need to specify term to search"
+      #   end
       end
     else
       puts "Run 'help' to see the available commands"
